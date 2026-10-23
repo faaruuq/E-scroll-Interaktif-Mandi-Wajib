@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Scroll Interaktif | Panduan Mengangkat Hadas Besar</title>
+    <style>
+        :root {
+            --bg-dark: #0a1f1c;
+            --card-bg-dark: #0f2e2a;
+            --primary-color: #173d37;
+            --accent-color: #e5b842;
+            --text-main: #f4f7f6;
+            --text-muted: #b0c4c0;
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Top Bar / Header Viewport Style */
+        header {
+            background: linear-gradient(135deg, #071916, #0f2e2a);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(229, 184, 66, 0.2);
+            position: relative;
+        }
+
+        .audio-icon {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: var(--accent-color);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .progress-container {
+            max-width: 650px;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 8px;
+            background: #1e4d46;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            max-width: 500px;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 15%; /* Adjust based on current scroll/step */
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        .progress-dot-start, .progress-dot-end {
+            width: 14px;
+            height: 14px;
+            background: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(229, 184, 66, 0.15);
+            color: var(--accent-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(229, 184, 66, 0.3);
+        }
+
+        header h1 {
+            color: var(--accent-color);
+            margin: 0.2rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Nav Pills */
+        .nav-pills {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1.5rem 0 0 0;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            background: #113630;
+            color: var(--text-main);
+            border: 1px solid #235c52;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .pill:hover, .pill.active {
+            background: var(--accent-color);
+            color: #000;
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Container & Cards */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card-bg-dark);
+            border: 1px solid #1c4d44;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card h2 {
+            color: var(--accent-color);
+            border-bottom: 1px solid #1c4d44;
+            padding-bottom: 0.8rem;
+            margin-top: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card h2 span {
+            background: rgba(229, 184, 66, 0.15);
+            color: var(--accent-color);
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+            border: 1px solid rgba(229, 184, 66, 0.3);
+        }
+
+        .arabic-text {
+            font-size: 1.8rem;
+            text-align: center;
+            direction: rtl;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            color: var(--accent-color);
+            margin: 1.5rem 0;
+            background: #081c19;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-right: 5px solid var(--accent-color);
+        }
+
+        .transliteration, .translation {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .transliteration {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .translation {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Lists */
+        .rukun-list, .tatacara-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rukun-list li, .tatacara-list li {
+            background: #0b2420;
+            border: 1px solid #1c4d44;
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .rukun-list li strong, .tatacara-list li strong {
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+
+        .rukun-list li p, .tatacara-list li p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        /* Quiz */
+        .quiz-container {
+            background: var(--card-bg-dark);
+            border: 2px solid #235c52;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 1.2rem;
+        }
+
+        .quiz-option {
+            background: #0b2420;
+            border: 1px solid #1c4d44;
+            color: var(--text-main);
+            padding: 14px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .quiz-option:hover {
+            background: #143b35;
+            border-color: var(--accent-color);
+        }
+
+        .quiz-option.correct {
+            background: #113822;
+            border-color: #28a745;
+            color: #d4edda;
+        }
+
+        .quiz-option.incorrect {
+            background: #3c191c;
+            border-color: #dc3545;
+            color: #f8d7da;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: #1e5c52;
+            color: white;
+            border: 1px solid #287a6c;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: #000;
+            border-color: var(--accent-color);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #1c4d44;
+            margin-top: 3rem;
+            background: #071916;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="audio-icon">🎵</div>
+        <div class="progress-container">
+            <div class="progress-dot-start"></div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-dot-end"></div>
+        </div>
+        
+        <div class="author-badge">
+            🎓 Disediakan oleh: Muhammad Al Faisal Bin Jamaludin
+        </div>
+        <h1>Smart Scroll Interaktif</h1>
+        <p>Panduan Mengangkat Hadas Besar Dengan Sempurna</p>
+
+        <div class="nav-pills">
+            <a href="#niat" class="pill">📖 Niat</a>
+            <a href="#rukun" class="pill">📑 Rukun</a>
+            <a href="#tatacara" class="pill">📜 Tatacara</a>
+            <a href="#quiz" class="pill">✅ Uji Kefahaman</a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Bahagian 1: Niat -->
+        <section class="card" id="niat">
+            <h2><span>1</span> Niat Mandi Wajib</h2>
+            <p class="text-center" style="color: var(--text-muted);">Lafaz Niat (Arab):</p>
+            <div class="arabic-text">نَوَيْتُ رَفْعَ الْحَدَثِ اْلأَكْبَرِ لِلَّهِ تَعَالَى</div>
+            <div class="transliteration">"Nawaitu raf'al hadasil akbari lillahi ta'ala"</div>
+            <div class="translation">"Sahaja aku mengangkat hadas besar kerana Allah Ta'ala."</div>
+            <div class="text-center" style="margin-top: 1.5rem;">
+                <button class="btn" onclick="alert('Audio sebutan niat dimainkan.')">🔊 Dengar Sebutan Niat</button>
+            </div>
+        </section>
+
+        <!-- Bahagian 2: Rukun -->
+        <section class="card" id="rukun">
+            <h2><span>2</span> Rukun Mandi Wajib (Sah Mandi)</h2>
+            <ul class="rukun-list">
+                <li>
+                    <strong>1. Niat</strong>
+                    <p>Niat dilakukan sewaktu air mula dihasratkan menyentuh mana-mana bahagian anggota tubuh.</p>
+                </li>
+                <li>
+                    <strong>2. Menghilangkan Najis</strong>
+                    <p>Membersihkan sebarang najis 'ainiyah yang melekat pada badan terlebih dahulu.</p>
+                </li>
+                <li>
+                    <strong>3. Meratakan Air</strong>
+                    <p>Meratakan air ke seluruh anggota badan termasuk kulit dan lipatan rambut/bulu.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Bahagian 3: Tatacara -->
+        <section class="card" id="tatacara">
+            <h2><span>3</span> Tatacara Lengkap (11 Langkah)</h2>
+            <p style="color: var(--accent-color); font-size: 0.9rem;"><em>Langkah 1 / 11 &bull; SUNAT</em></p>
+            <h3 style="color: var(--text-main);">Mencuci Kedua-dua Belah Tangan</h3>
+            <p>Basuh kedua-dua belah tangan sebanyak 3 kali menggunakan air bersih sebelum memasukkan tangan ke dalam bejana air.</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">💡 <em>Petua: Memastikan tangan bebas daripada sebarang kotoran sebelum bersuci.</em></p>
+            <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                <button class="btn" onclick="alert('Ini adalah langkah pertama.')"> Sebelum</button>
+                <button class="btn" onclick="alert('Audio penerangan langkah dimainkan.')">🔊 Audio Penerangan</button>
+                <button class="btn" onclick="alert('Seterusnya...')">Seterusnya </button>
+            </div>
+        </section>
+
+        <!-- Bahagian 4: Uji Kefahaman -->
+        <section class="quiz-container" id="quiz">
+            <h2><span>4</span> Uji Kefahaman Anda</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Soalan Interaktif &bull; Soalan 1 dari 3</p>
+            <h3 style="color: var(--text-main);">Antara berikut, manakah merupakan RUKUN mandi wajib yang SAH?</h3>
+            <div class="quiz-options">
+                <button class="quiz-option" onclick="checkAnswer(this, false)">Membaca doa selepas mandi</button>
+                <button class="quiz-option" onclick="checkAnswer(this, true)">Meratakan air ke seluruh anggota badan</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">Memulakan mandi dengan anggota kanan</button>
+                <button class="quiz-option" onclick="checkAnswer(this, false)">Mencuci tangan 3 kali</button>
+            </div>
+            <p id="quiz-feedback" style="margin-top: 1rem; font-weight: bold; text-align: center;"></p>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>Smart Scroll Interaktif &bull; Panduan Mengangkat Hadas Besar secara Sempurna</p>
+        <p style="margin-top: 5px;">Disediakan oleh: Muhammad Al Faisal Bin Jamaludin</p>
+    </footer>
+
+    <script>
+        function checkAnswer(button, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.textContent.includes('Meratakan air')) {
+                    opt.classList.add('correct');
+                }
+            });
+
+            const feedback = document.getElementById('quiz-feedback');
+            if (isCorrect) {
+                feedback.style.color = '#28a745';
+                feedback.textContent = 'Tahniah! Jawapan anda betul.';
+            } else {
+                button.classList.add('incorrect');
+                feedback.style.color = '#dc3545';
+                feedback.textContent = 'Kurang tepat. Jawapan yang betul ialah "Meratakan air ke seluruh anggota badan".';
+            }
+        }
+    </script>
+</body>
+</html>
